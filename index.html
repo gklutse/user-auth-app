@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html ng-app="authApp">
+<head>
+  <title>User Auth App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <!-- W3.CSS and Font Awesome -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    .center-screen {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body ng-controller="MainCtrl">
+
+  <!-- LOGIN -->
+  <div class="w3-display-container center-screen" ng-show="page === 'login'">
+    <form class="w3-display-middle w3-container w3-card-4 w3-light-grey w3-text-blue" style="width:90%; max-width:500px;">
+      <h2 class="w3-center">Login</h2>
+
+      <div class="w3-row w3-section">
+        <div class="w3-col" style="width:50px"><i class="w3-xlarge fa fa-user"></i></div>
+        <div class="w3-rest">
+          <input class="w3-input w3-border" type="text" ng-model="loginData.username" placeholder="Username" required>
+        </div>
+      </div>
+
+      <div class="w3-row w3-section">
+        <div class="w3-col" style="width:50px"><i class="w3-xlarge fa fa-lock"></i></div>
+        <div class="w3-rest">
+          <input class="w3-input w3-border" type="password" ng-model="loginData.password" placeholder="Password" required>
+        </div>
+      </div>
+
+      <div class="w3-row">
+        <div class="w3-half">
+          <button type="button" class="w3-button w3-block w3-red w3-margin-bottom" ng-click="page='signup'">Signup</button>
+        </div>
+        <div class="w3-half">
+          <button type="button" class="w3-button w3-block w3-blue w3-margin-bottom" ng-click="login()">Login</button>
+        </div>
+      </div>
+
+      <p class="w3-text-red" ng-show="error">{{ error }}</p>
+    </form>
+  </div>
+
+  <!-- SIGNUP -->
+  <div class="w3-display-container center-screen" ng-show="page === 'signup'">
+    <form class="w3-display-middle w3-container w3-card-4 w3-light-grey w3-text-blue" style="width:90%; max-width:500px;">
+      <h2 class="w3-center">Sign Up</h2>
+
+      <div class="w3-row w3-section">
+        <div class="w3-col" style="width:50px"><i class="w3-xlarge fa fa-user-plus"></i></div>
+        <div class="w3-rest">
+          <input class="w3-input w3-border" type="text" ng-model="signupData.username" placeholder="Username" required>
+        </div>
+      </div>
+
+      <div class="w3-row w3-section">
+        <div class="w3-col" style="width:50px"><i class="w3-xlarge fa fa-envelope"></i></div>
+        <div class="w3-rest">
+          <input class="w3-input w3-border" type="text" ng-model="signupData.email" placeholder="Email" required>
+        </div>
+      </div>
+
+      <div class="w3-row w3-section">
+        <div class="w3-col" style="width:50px"><i class="w3-xlarge fa fa-lock"></i></div>
+        <div class="w3-rest">
+          <input class="w3-input w3-border" type="password" ng-model="signupData.password" placeholder="Password" required>
+        </div>
+      </div>
+
+      <div class="w3-row">
+        <div class="w3-half">
+          <button type="button" class="w3-button w3-block w3-red w3-margin-bottom" ng-click="page='login'">Back</button>
+        </div>
+        <div class="w3-half">
+          <button type="button" class="w3-button w3-block w3-blue w3-margin-bottom" ng-click="signup()">Sign Up</button>
+        </div>
+      </div>
+
+      <p class="w3-text-red" ng-show="error">{{ error }}</p>
+    </form>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="w3-display-container center-screen" ng-show="page === 'dashboard'">
+    <div class="w3-display-middle w3-container w3-card-4 w3-light-grey w3-padding" style="width:90%; max-width:500px;">
+      <h2 class="w3-center">Dashboard</h2>
+      <p><strong>Welcome,</strong> {{ user.username }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <hr>
+      <button type="button" class="w3-button w3-red w3-block" ng-click="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    angular.module('authApp', [])
+      .controller('MainCtrl', function ($scope, $http) {
+        $scope.page = 'login';
+        $scope.loginData = {};
+        $scope.signupData = {};
+        $scope.error = '';
+
+        $scope.signup = function () {
+          $http.post('signup.php', $scope.signupData).then(res => {
+            if (res.data.status === 'success') {
+              $scope.page = 'login';
+              $scope.error = '';
+            } else {
+              $scope.error = res.data.message;
+            }
+          });
+        };
+
+        $scope.login = function () {
+          $http.post('login.php', $scope.loginData).then(res => {
+            if (res.data.status === 'success') {
+              $scope.user = res.data.user;
+              $scope.page = 'dashboard';
+              $scope.error = '';
+            } else {
+              $scope.error = res.data.message;
+            }
+          });
+        };
+
+        $scope.logout = function () {
+          $scope.user = null;
+          $scope.page = 'login';
+        };
+      });
+  </script>
+
+</body>
+</html>
